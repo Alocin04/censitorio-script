@@ -3,7 +3,7 @@ from spotipy.oauth2 import SpotifyOAuth
 
 import os
 from dotenv import load_dotenv, find_dotenv
-print(__file__)
+# print(__file__)
 load_dotenv(find_dotenv())
 
 from flask import Flask, request, url_for, session, redirect
@@ -13,7 +13,7 @@ import filter_song
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-print(__name__)
+# print(__name__)
 app = Flask(__name__)
 app.config["SESSION_COOCKIE_NAME"] = "pipi"
 app.secret_key = "gay"
@@ -40,7 +40,7 @@ def create_playlist():
         print("User are not logged in")
         return redirect("/")
     
-    torio = "3gQEmyPWOxbSnNJzeqVSi5"
+    torio_playlist = "3gQEmyPWOxbSnNJzeqVSi5"
     playlists = {
                  "Rezza Capa": "1DkkgB2T4qShCdzknEC8Iv",
                  "Nicola": "4Z3UtePQqtlMcJxkcHS5BP",
@@ -51,11 +51,34 @@ def create_playlist():
     spotify = spotipy.Spotify(auth=token_info["access_token"])
     
     # spotify.playlist_remove_all_occurrences_of_items(playlists["Rezza Capa"], [cazziFreestyle], snapshot_id=None)
-    playlist = spotify.playlist_items(playlists["Rezza Capa"], fields="next, items.track.uri, items.track.name") 
     
-    playlist2 = spotify.next(playlist)
+    # playlist = spotify.playlist_items(torio, fields="next, items.track.uri, items.track.name") 
+    # next = {"next": playlist["next"]}
+    # print(next)
+    # playlist2 = spotify.next(next)
     
-    return playlist2
+    # return playlist2
+    
+    torio_song = {}
+    playlist = spotify.playlist_items(torio_playlist, fields="next, items.track.uri, items.track.name") 
+    
+    while True:
+        items = playlist["items"]
+        for item in items:
+            uri = item["track"]["uri"]
+            is_local = uri.split(":")[1] == "local"
+            if(not is_local):
+                torio_song[uri] = 0
+            # torio_song[uri] = 0
+        
+        next = {"next": playlist["next"]}
+        if(next["next"] == None):
+            break
+        else:
+            playlist = None
+            playlist = spotify.next(next)
+            
+    return torio_song
     
 
 def spotify_oauth():
