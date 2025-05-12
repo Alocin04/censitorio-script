@@ -96,13 +96,14 @@ if len(monthly_backup_playlists) > 0:
             general_backup_uris = spotify_client.get_uris_from_songs(general_backup_songs) # Get a list with all the playlist's songs' uris
             logging.debug(f"General backup uris: {general_backup_uris}")
             
-            #* Filtering songs which are already in the general backup
+            #* Filtering songs that are already in the general backup
             new_songs = []
             for uri in playlist_uris:
                 if not uri in general_backup_uris and not uri in new_songs:
                     new_songs.append(uri)
             spotify_client.add_songs_to_playlist(new_songs, general_backup_id)
 logging.info("Ended backup process")
+
 
 
 # ID_WAITING_ROOM = PLAYLISTS["ID_WAITING_ROOM"]
