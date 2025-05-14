@@ -49,6 +49,30 @@ def get_timezone_date(date, timezone):
 
 
 # ---------------------------------------------------------------------------- #
+#                                     DICT                                     #
+# ---------------------------------------------------------------------------- #
+def create_counter_dict(keys: list) -> dict:
+    """Adds keys and 0 as value to a dict
+
+    Args:
+        keys: the structure that contains the keys of the returned dict
+
+    Returns:
+        counters_dict: the dict with the format "uris: 0" (key: value)
+    """
+    counters_dict = {}
+    for key in keys:
+        logging.debug("Item of the playlist: " + str(key))
+        
+            
+    logging.info(f"Playlist's lenght: {len(counters_dict)}")
+    logging.info(f"Playlist's songs: {counters_dict}")
+    
+    return counters_dict
+# --------------------------------- FINE DICT -------------------------------- #
+
+
+# ---------------------------------------------------------------------------- #
 #                                 GENERAL UTIL                                 #
 # ---------------------------------------------------------------------------- #
 def get_data(url, headers):

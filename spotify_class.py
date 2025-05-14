@@ -97,7 +97,38 @@ class SpotifyClient:
         
         return uris
     
-    def add_songs_to_playlist(spotify, songs, playlist):
+    def create_songs_dict(self, songs: list) -> dict:
+        """Extracts the songs' data from the returned structure of the Spotify API
+        and creates a dict with the format "uri: {name: name, artist: artist, ...}"
+
+        Args:
+            songs (list): list of dictionaries containing the songs' data
+            Each dictionary has the following structure:
+            [
+                {
+                    'track': {
+                        'name': "Name of song", 
+                        'uri': 'spotify:track:6vn8dvUpDC4YeaAh3BI25r',
+                        ...: ...,
+                    }
+                }
+            ]
+
+        Returns:
+            songs_dict (dict): dict of songs
+        """
+        songs_dict = {}
+        for song in songs:
+            
+            if not "track" in song:
+                continue
+            track = song["track"]
+            songs_dict[track["uri"]] = track
+            songs_dict[track["uri"]].pop("uri")
+        
+        return songs_dict
+    
+    def add_songs_to_playlist(self, songs: list, playlist_id: str) -> None:
         """Add songs from a playlist
 
         Args:
@@ -110,7 +141,7 @@ class SpotifyClient:
             add_list = songs[:SPLIT]
             del songs[:SPLIT]
             # print(add_list)
-            spotify.playlist_add_items(playlist, add_list)
+            self._spotipy.playlist_add_items(playlist_id, add_list)
     
     def delete_songs_from_playlist(self, songs: list, playlist_id: str) -> None:
         """Delete songs from a playlist
@@ -126,3 +157,25 @@ class SpotifyClient:
             del songs[:SPLIT]
             # print(remove_list)
             self._spotipy.playlist_remove_all_occurrences_of_items(playlist_id, remove_list)
+    
+    def remove_local_songs_from_playlist(self, songs: list, playlist_id: str) -> list:
+        """Remove local songs from the playlist and from the list of songs
+
+        Args:
+            songs: the list that contains the songs' uri
+
+        Returns:
+            local_songs: the list of local songs
+        """
+        local_songs = []
+        for song in songs:
+            # EX of uri: 
+            if (song.split(":")[1] == "local"):
+                local_songs.append(song)
+                songs.remove(song)
+        
+        self.delete_songs_from_playlist(local_songs, playlist_id)
+        logging.info(f"Number of local songs removed: {len(local_songs)}")
+        logging.debug(f"Local songs: {local_songs}")        
+        
+        return local_songs

@@ -1,3 +1,28 @@
 {
-  
+  "waiting_room_id": "{id_playlist}",
+  "universal_playlist_id": "{id_playlist}",
+  "monthly_backup_playlists": {
+    "{name_playlist_1}": {
+      "playlist_id": "{id_playlist}",
+      "backup_id": "{id_playlist}",
+      "general_backup_id": "{id_playlist}"
+    },
+    "{name_playlist_2}": {
+      "playlist_id": "{id_playlist}",
+      "backup_id": "{id_playlist}"
+    },
+    "{name_playlist_3}": {
+      "playlist_id": "{id_playlist}",
+      "general_backup_id": "{id_playlist}"
+    },
+    "...": {
+      "...": "..."
+    }
+  },
+  "personal_playlists_ids": {
+    "{user_1_name}": "{id_playlist}",
+    "{user_2_name}": "{id_playlist}",
+    "{user_3_name}": "{id_playlist}",
+    "...": "..."
+  }
 }
