@@ -58,11 +58,12 @@ def create_counter_dict(keys: list) -> dict:
         keys: the structure that contains the keys of the returned dict
 
     Returns:
-        counters_dict: the dict with the format "uris: 0" (key: value)
+        counters_dict: the dict with the format "key: 0" (key: value)
     """
     counters_dict = {}
     for key in keys:
-        logging.debug("Item of the playlist: " + str(key))
+        # logging.debug("Item of the playlist: " + str(key))
+        counters_dict[key] = 0
         
             
     logging.info(f"Playlist's lenght: {len(counters_dict)}")

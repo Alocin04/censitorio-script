@@ -89,9 +89,17 @@ class SpotifyClient:
         uris = []
         for song in songs:
             if not "track" in song:
+                logging.warning(f"Song not valid: {song}")
+                continue
+            if song["track"] == None:
+                logging.warning(f"Song not valid: {song}")
                 continue
             track = song["track"]
             if not "uri" in track:
+                logging.warning(f"Song not valid: {track}")
+                continue
+            if track["uri"] == None:
+                logging.warning(f"Song not valid: {track}")
                 continue
             uris.append(track["uri"])
         
@@ -121,6 +129,8 @@ class SpotifyClient:
         for song in songs:
             
             if not "track" in song:
+                continue
+            if song["track"] == None:
                 continue
             track = song["track"]
             songs_dict[track["uri"]] = track
