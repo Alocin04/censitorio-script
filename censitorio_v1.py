@@ -11,10 +11,10 @@ from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, request, url_for, session, redirect # Flask, needed for diplaying the Spotify's login pop-up
 
 # local file
-from playlist import get_counters_dict, get_songs_list, get_songs_from_playlist
-from playlist import delete_songs_from_playlist, add_songs_to_playlist
-from playlist import hard_reset, soft_reset, remove_duplicate
-from playlist import ID_PLAYLIST, ID_WAITING_ROOM, ID_BACKUP, IDS_PLAYLISTS, FILTER, MIN_LIKE
+from playlist_v1 import get_counters_dict, get_songs_list, get_songs_from_playlist
+from playlist_v1 import delete_songs_from_playlist, add_songs_to_playlist
+from playlist_v1 import hard_reset, soft_reset, remove_duplicate
+from playlist_v1 import ID_PLAYLIST, ID_WAITING_ROOM, ID_BACKUP, IDS_PLAYLISTS, FILTER, MIN_LIKE
 
 from math import ceil
 import time

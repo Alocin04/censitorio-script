@@ -1,0 +1,26 @@
+{
+  "waiting_room_id": "n03E49W9xbmClkFsHaFGbB",
+  "universal_playlist_id": "EZq7fwVMcOaMcohUvjJD3c",
+  "eniversal_playlist_id": "Ll7bJJ5qYTIBi8aNjvxClY",
+  "monthly_backup_playlists": {
+    "waiting_room": {
+      "playlist_id": "n03E49W9xbmClkFsHaFGbB",
+      "backup_id": "W6DM4l0Ow5zzllmkyoUg3n",
+      "general_backup_id": "D8UUbZM72jTGR4Z36yJjra"
+    },
+    "universal_playlist": {
+      "playlist_id": "EZq7fwVMcOaMcohUvjJD3c",
+      "backup_id": "eMh7ZfIwR0S8Otu4ByMaYa"
+    },
+    "nicola_playlist": {
+      "playlist_id": "UyUGa1yJNF0lVxNxSOM1to",
+      "backup_id": "ieypgqVBXBptmjGO9gBPW7",
+      "general_backup_id": "hojjWAJsSxaAOa6bw8pvE1"
+    }
+  },
+  "personal_playlists_ids": {
+    "Nicola": "UyUGa1yJNF0lVxNxSOM1to",
+    "John": "21jAe89MGY3VmpkLau8vPo",
+    "Ahmed": "Ll7bJJ5qYTIBi8aNjvxClY"
+  }
+}
