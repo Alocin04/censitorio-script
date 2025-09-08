@@ -2,6 +2,7 @@
 import os
 import json
 import time
+from math import ceil
 
 import logging
 logging.basicConfig(filename='censitorio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -129,6 +130,35 @@ logging.debug(f"Waiting room's dict: {waiting_room_dict}")
 spotify_client.remove_local_songs_from_playlist(waiting_room_uris, waiting_room_id) # Deletion of local songs (they can't be added)
 songs_likes = create_counter_dict(waiting_room_uris) # Dict where it will be stored the number of likes for each song
 
+#!MONTHLY STATISTICS
+monthly_statistics = {
+    "songs": {},
+    "songs_added": {
+        "number": 0,
+        "songs": {}
+    },
+    "songs_removed_from_universal": {
+        "number": 0,
+        "songs": {}
+    },
+    "songs_removed_from_waiting_room": {
+        "number": 0,
+        "songs": {}
+    }
+}
+for uri in waiting_room_uris:
+    if uri in monthly_statistics:
+        continue
+    song_data = waiting_room_dict[uri]
+    monthly_statistics["songs"][uri] = {
+        "name": song_data["name"],
+        "counter": 0,
+        "votes": [],
+    }
+# print(len(monthly_statistics))
+# print(len(waiting_room_dict))
+# print(len(waiting_room_uris))
+
 #* Counting likes for each song
 personal_playlists_ids = PLAYLISTS["personal_playlists_ids"]
 users_playlists = {} # Used to avoid the same API request more than once per execution in further elaboration ("CLEANING PERSONAL PLAYLIST" section)
@@ -149,6 +179,10 @@ for user, id_playlist in personal_playlists_ids.items():
         if (uri in songs_likes):
             songs_likes[uri] += 1
             
+            #!MONTHLY STATISTICS
+            monthly_statistics["songs"][uri]["counter"] += 1
+            if not (user in monthly_statistics["songs"][uri]["votes"]):
+                monthly_statistics["songs"][uri]["votes"].append(user)
 logging.debug(f"Songs' likes: {songs_likes}")
 
 #* Calculating minimum number of likes that a song need to be added to the universal playlist
@@ -190,7 +224,13 @@ for uri, likes in songs_likes.items():
         logging.info(f"Winner song: {waiting_room_dict[uri]['name']} ({uri}), added by {likes} people")
         winner_songs.append(uri)
         
+        #!MONTHLY STATISTICS
+        song_data = monthly_statistics["songs"][uri]
+        monthly_statistics["songs_added"]["songs"][uri] = song_data
+        
 spotify_client.add_songs_to_playlist(winner_songs.copy(), universal_playlist_id) # It use a copy because winner_songs could be used again later
+
+monthly_statistics["songs_added"]["number"] = len(winner_songs) #!MONTHLY STATISTICS
 
 #* Removing from the universal playlist the songs that have not received enough likes 
 """ 
@@ -200,28 +240,42 @@ spotify_client.add_songs_to_playlist(winner_songs.copy(), universal_playlist_id)
     If you want to remove only the songs that haven't enough likes, use the second method.
 """
 loser_songs  = []
-#METHOD 1: removes also songs deleted from waiting room
+#METHOD 1: keeps only winner songs
 for uri in universal_playlist_uris:
     if not (uri in waiting_room_uris):
         logging.warning(f"Song not present in waiting room: {uri}, removed from universal playlist")
         loser_songs.append(uri)
+        
+        monthly_statistics["songs_removed_from_universal"]["songs"][uri] = {} #!MONTHLY STATISTICS
+        
         continue
-
     likes = songs_likes[uri] # it doesn't check if it's in songs_likes because it has the same uris as waiting_room_uris 
     if likes<required_like and not (uri in loser_songs):
         name = waiting_room_dict[uri]["name"]
         logging.info(f"Universal loser song: {name} ({uri}), added by {likes} people")
         loser_songs.append(uri)
+        
+        #!MONTHLY STATISTICS
+        song_data = monthly_statistics["songs"][uri]
+        monthly_statistics["songs_removed_from_universal"]["songs"][uri] = song_data
+        
 #METHOD 2: removes only loser songs
 # for uri, likes in songs_likes.items():
 #     if likes<required_like and uri in universal_playlist_uris and not (uri in loser_songs):
 #         logging.info(f"Loser song: {waiting_room_dict[uri]["name"]} ({uri}), added by {likes} people")
 #         loser_songs.append(uri)
+
+#         #!MONTHLY STATISTICS
+#         song_data = monthly_statistics["songs"][uri]
+#         monthly_statistics["songs_removed_from_universal"]["songs"][uri] = song_data
+
 spotify_client.delete_songs_from_playlist(loser_songs.copy(), universal_playlist_id) # It use a copy because loser_songs could be used again later
+
+monthly_statistics["songs_removed_from_universal"]["number"] = len(loser_songs) #!MONTHLY STATISTICS
 
 
 # --------------------------- CLEANING WAITING ROOM -------------------------- #
-# Removes the songs that haven't reach the required likes
+# Removes the songs that haven
 logging.info(f"Cleaning waiting room...")
 loser_songs.clear()
 for uri, likes in songs_likes.items():
@@ -229,7 +283,12 @@ for uri, likes in songs_likes.items():
         logging.info(f"Waiting room loser song: {waiting_room_dict[uri]['name']} ({uri}), added by {likes} people")
         loser_songs.append(uri)
         
+        #!MONTHLY STATISTICS
+        song_data = monthly_statistics["songs"][uri]
+        monthly_statistics["songs_removed_from_waiting_room"]["songs"][uri] = song_data
 spotify_client.delete_songs_from_playlist(loser_songs.copy(), waiting_room_id) # It use a copy because loser_songs could be used again later
+
+monthly_statistics["songs_removed_from_waiting_room"]["number"] = len(loser_songs) #!MONTHLY STATISTICS
 
 
 # ------------------------ CLEANING PERSONAL PLAYLISTS ----------------------- #
@@ -239,23 +298,48 @@ spotify_client.delete_songs_from_playlist(loser_songs.copy(), waiting_room_id) #
     Using this it clean the playlist, removing the loser songs and the one that aren't in waiting room.
     If you want, you can remove only the loser songs using the second method and commentating the first.
 """
-#METHOD 1: removes also songs deleted from waiting room
+#METHOD 1: keeps only winner songs
 for user, uris in users_playlists.items():
     logging.info(f"Cleaning {user}'s playlist...")
+    
+    #!MONTHLY STATISTICS
+    monthly_statistics["songs_removed_from_"+user] = {
+        "number": 0,
+        "songs": {}
+    }
+    
     loser_songs.clear()
-
     for uri in uris:
         if not (uri in waiting_room_uris):
             logging.warning(f"Song not present in waiting room: {uri}, removed from personal playlist")
             loser_songs.append(uri)
+            
+            monthly_statistics["songs_removed_from_"+user]["songs"][uri] = {} #!MONTHLY STATISTICS
+            
             continue
         likes = songs_likes[uri] # it doesn't check if it's in songs_likes because it has the same uris as waiting_room_uris 
         if likes<required_like and not (uri in loser_songs):
             name = waiting_room_dict[uri]["name"] # it doesn't check if it's in waiting_room_dict because it has the same uris as waiting_room_uris
             logging.debug(f"User loser song: {name} ({uri}), added by {likes} people")
             loser_songs.append(uri)
+            
+            #!MONTHLY STATISTICS
+            song_data = monthly_statistics["songs"][uri]
+            monthly_statistics["songs_removed_from_"+user]["songs"][uri] = song_data
     spotify_client.delete_songs_from_playlist(loser_songs.copy(), personal_playlists_ids[user])
+    
+    monthly_statistics["songs_removed_from_"+user]["number"] = len(loser_songs) #!MONTHLY STATISTICS
+    
 #METHOD 2: removes only loser songs
 # for user, playlist_id in personal_playlists_ids.items():
 #     logging.info(f"Cleaning {user}'s playlist...")
 #     spotify_client.delete_songs_from_playlist(loser_songs.copy(), playlist_id)
+
+
+
+# --------------------------- MONTHLY STATISTICS --------------------------- #    
+with open("monthly_statistics.json", "w") as f:
+    json.dump(monthly_statistics, f)
+    
+print(f"--- TIME OF EXECUTION {time.time() - start_time}---")
+    
