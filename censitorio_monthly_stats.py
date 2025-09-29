@@ -2,7 +2,7 @@
 import os
 import json
 import time
-from math import ceil
+from math import floor
 
 import logging
 logging.basicConfig(filename='censitorio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -192,22 +192,10 @@ logging.debug(f"Songs' likes: {songs_likes}")
     Then I thought: "This project is aimed for friends groups, who will be use this with more than 15-20 people?"
     So I choose to do a simple if, but if you found a better way let me know   
 """
-required_like = 0
 playlists_number = len(users_playlists)
 logging.info(f"Number of valid playlists: {playlists_number}")
 # This if can be changed based on you friends group
-if playlists_number <= 3:
-    required_like = playlists_number
-elif playlists_number >= 4 and playlists_number <= 6:
-    required_like = 3
-elif playlists_number >= 7 and playlists_number <= 8:
-    required_like = 4
-elif playlists_number >= 9 and playlists_number <= 11:
-    required_like = 5
-elif playlists_number >= 12 and playlists_number <= 15:
-    required_like = 6
-elif playlists_number >= 16 and playlists_number <= 20:
-    required_like = 7
+required_like = floor(playlists_number/2) + 1
 logging.info(f"Required like to be added to the official playlist: {required_like}")
     
 #* Extraction of the universal playlist songs    
