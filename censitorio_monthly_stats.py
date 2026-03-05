@@ -5,7 +5,8 @@ import time
 from math import floor
 
 import logging
-logging.basicConfig(filename='censitorio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+# logging.basicConfig(filename='censitorio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename='censitorio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from spotify_class import SpotifyClient
 from utility import create_counter_dict
@@ -72,13 +73,13 @@ if len(monthly_backup_playlists) > 0:
         playlist_songs = spotify_client.get_songs_from_playlist(playlist_id, FILTER)
         logging.debug(f"Playlist songs: {playlist_songs}")
         playlist_uris = spotify_client.get_uris_from_songs(playlist_songs) # Get a list with all the playlist's songs' uris
-        # logging.debug(f"Playlist uris: {playlist_uris}")
+        logging.debug(f"Playlist uris: {playlist_uris}")
         spotify_client.remove_local_songs_from_playlist(playlist_uris, playlist_id) 
         
         # Creation of the monthly backup playlist
         if "backup_id" in ids:
             backup_id = ids["backup_id"]
-            logging.debug(f"Backup id: {backup_id}")
+            logging.info(f"Backup id: {backup_id}")
             backup_songs = spotify_client.get_songs_from_playlist(backup_id, FILTER)
             logging.debug(f"Backup songs: {backup_songs}")
             backup_uris = spotify_client.get_uris_from_songs(backup_songs) # Get a list with all the playlist's songs' uris
@@ -87,23 +88,26 @@ if len(monthly_backup_playlists) > 0:
             #* Deletion of the songs in the backup
             # The backup is monthly, so it "restart" the playlist everytime and then add the current months songs
             # So the backup will always be the exact copy of the current playlist
-            spotify_client.delete_songs_from_playlist(backup_uris, backup_id)
+            spotify_client.delete_songs_from_playlist(backup_uris.copy(), backup_id)
             #* Addition of the songs in the backup
-            spotify_client.add_songs_to_playlist(playlist_uris, backup_id)
+            spotify_client.add_songs_to_playlist(playlist_uris.copy(), backup_id)
         
         # Creation of the general backup playlist
         if "general_backup_id" in ids:
             general_backup_id = ids["general_backup_id"]
-            logging.debug(f"General backup id: {general_backup_id}")
+            logging.info(f"General backup id: {general_backup_id}")
             general_backup_songs = spotify_client.get_songs_from_playlist(general_backup_id, FILTER)
             logging.debug(f"General backup songs: {general_backup_songs}")
             general_backup_uris = spotify_client.get_uris_from_songs(general_backup_songs) # Get a list with all the playlist's songs' uris
             # logging.debug(f"General backup uris: {general_backup_uris}")
+            # logging.error(f"Uris: {playlist_uris}")
             
             #* Filtering songs that are already in the general backup
             new_songs = []
             for uri in playlist_uris:
-                if not uri in general_backup_uris and not uri in new_songs:
+                # logging.debug(f"Checking if {uri} is in general backup...")
+                # logging.debug(not (uri in general_backup_uris) and not (uri in new_songs))
+                if not (uri in general_backup_uris) and not (uri in new_songs):
                     new_songs.append(uri)
             spotify_client.add_songs_to_playlist(new_songs, general_backup_id)
 logging.info("Ended backup process")
@@ -291,10 +295,10 @@ for user, uris in users_playlists.items():
     logging.info(f"Cleaning {user}'s playlist...")
     
     #!MONTHLY STATISTICS
-    monthly_statistics["songs_removed_from_"+user] = {
-        "number": 0,
-        "songs": {}
-    }
+    # monthly_statistics["songs_removed_from_"+user] = {
+    #     "number": 0,
+    #     "songs": {}
+    # }
     
     loser_songs.clear()
     for uri in uris:
@@ -302,7 +306,7 @@ for user, uris in users_playlists.items():
             logging.warning(f"Song not present in waiting room: {uri}, removed from personal playlist")
             loser_songs.append(uri)
             
-            monthly_statistics["songs_removed_from_"+user]["songs"][uri] = {} #!MONTHLY STATISTICS
+            # monthly_statistics["songs_removed_from_"+user]["songs"][uri] = {} #!MONTHLY STATISTICS
             
             continue
         likes = songs_likes[uri] # it doesn't check if it's in songs_likes because it has the same uris as waiting_room_uris 
@@ -312,11 +316,11 @@ for user, uris in users_playlists.items():
             loser_songs.append(uri)
             
             #!MONTHLY STATISTICS
-            song_data = monthly_statistics["songs"][uri]
-            monthly_statistics["songs_removed_from_"+user]["songs"][uri] = song_data
+            # song_data = monthly_statistics["songs"][uri]
+            # monthly_statistics["songs_removed_from_"+user]["songs"][uri] = song_data
     spotify_client.delete_songs_from_playlist(loser_songs.copy(), personal_playlists_ids[user])
     
-    monthly_statistics["songs_removed_from_"+user]["number"] = len(loser_songs) #!MONTHLY STATISTICS
+    # monthly_statistics["songs_removed_from_"+user]["number"] = len(loser_songs) #!MONTHLY STATISTICS
     
 #METHOD 2: removes only loser songs
 # for user, playlist_id in personal_playlists_ids.items():

@@ -61,7 +61,7 @@ class SpotifyClient:
                 logging.info("No more pages")
                 break
             else:
-                logging.info("Another page found")
+                logging.info(f"Another page found: {iterations+1}")
                 songs = None
                 songs = self._spotipy.next(next)
         
