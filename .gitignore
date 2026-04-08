@@ -133,7 +133,7 @@ ENV/
 env.bak/
 venv.bak/
 playlists.json
-monthly_statistics.json
+monthly_statistics
 
 # Spyder project settings
 .spyderproject

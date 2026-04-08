@@ -3,6 +3,7 @@ import os
 import json
 import time
 from math import floor
+from datetime import datetime
 
 import logging
 # logging.basicConfig(filename='censitorio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -329,8 +330,10 @@ for user, uris in users_playlists.items():
 
 
 
-# --------------------------- MONTHLY STATISTICS --------------------------- #    
-with open("monthly_statistics.json", "w") as f:
+# --------------------------- MONTHLY STATISTICS --------------------------- #  
+now = datetime.now()
+year_month = now.strftime("%y-%m") # Get the current month and year in the
+with open(f"./monthly_statistics/monthly_statistics_{year_month}.json", "w") as f:
     json.dump(monthly_statistics, f)
     
 print(f"--- TIME OF EXECUTION {time.time() - start_time}---")
