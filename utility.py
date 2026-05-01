@@ -96,36 +96,36 @@ def put_data(url, headers, data):
 
 def handle_status(status):
     if(status==200):
-        #logging.info('200 OK')
-        print("OK! 200")
+        logging.debug('200 OK')
+        #print("OK! 200")
         return True
     if(status==201):
-        #logging.info('200 OK')
-        print("OK! 201")
+        logging.debug('201 Created')
+        #print("OK! 201")
         return True
     if(status==202):
-        #logging.info('200 OK')
-        print("OK! 202")
+        logging.debug('202 Accepted')
+        #print("OK! 202")
         return True
     if(status==203):
-        #logging.info('200 OK')
-        print("OK! 203")
+        logging.debug('203 Non-Authoritative Information')
+        #print("OK! 203")
         return True
     if(status==400):
-        #logging.error('400 Bad Request')
-        print("Error 400!")
+        logging.error('400 Bad Request')
+        #print("Error 400!")
         return False
     if(status==401):
-        #logging.error('401 Unauthorized')
-        print("Error 401!")
+        logging.error('401 Unauthorized')
+        #print("Error 401!")
         return False
     if(status==404):
-        #logging.error('404 Not Found')
-        print("Error 404!")
+        logging.error('404 Not Found')
+        #print("Error 404!")
         return False
     if(status==500):
-        #logging.error('500 Internal Server Error')
-        print("Error 500!")
+        logging.error('500 Internal Server Error')
+        #print("Error 500!")
         return False
 
 def is_null(var):
