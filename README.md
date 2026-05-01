@@ -1,4 +1,5 @@
 # 🎵 Censitorio musicale (Torio's musical census) 🎵
+
 ## Overview
 **Automate your group's monthly music discovery.** This project handles the collective selection of the best tracks from a shared Spotify playlist. No more debating which songs deserve to stay - let the data decide!
 
@@ -20,6 +21,7 @@
 * **Spotify API**: The project uses the Spotify API to interact with Spotify playlists and extract data.
 
 ## Usage
+
 ### Installation
 1. Clone the repository using `git clone`.
 2. Create a virtual environment (venv) and enter it with `source ./bin/activate` for Linux or `./bin/activate` for Windows.
@@ -37,5 +39,3 @@
 * **Cleanup:** every time the script runs, songs that *didn't* make the cut are automatically removed from both the shared and personal playlists.
 * **No Local Files:** Only songs available on the Spotify streaming catalog are supported. Local files will be ignored.
 * **Permissions:** The authenticated Spotify account must have full `read/write` access to all involved playlists to smoothly execute the code.
-
-## 📸 Screenshots
